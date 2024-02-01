@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js" integrity="sha512-uaz5GpnQoE6t5echKlX8P52czvsIGgLPcvlzfvRubLZ1Hp8JemUDnbUiAahbVtPb+jUVrNETuXvAhDDF/N3M4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Includes the p5.collide2D addon library -->
+    <script defer src="https://unpkg.com/p5.collide2d"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.js" integrity="sha512-TU9AWtV5uUZPX8dbBAH8NQF1tSdigPRRT82vllAQ1Ke28puiqLA6ZVKxtUGlgrH6yWFnkKy+sE6luNEGH9ar0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+         body { 
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let w = window.innerWidth 
+        let h = window.innerHeight
+        //create variable that will store the image
+        let img 
+        let movingFire
+        let player
+
+        let hits = false
+        let hitSound
+
+        let score = 0
+
+        //preload assets 
+        function preload () { 
+            //assign image
+            fireball = loadImage('fireballDraw.png')
+            hitSound = loadSound('downer_noise.mp3')
+        }
+
+        function setup() { 
+            createCanvas(w,h)
+            movingFire = new fireballs()
+            /*player = new block()*/
+
+        }
+
+        function fireballs () { 
+            this.x = 0
+            this.y = (h/2)-50
+            this.xVelocity = 12
+
+            this.yBlock = 0
+            this.yVelocity = 6
+
+            this.show = function() {
+                //image(variable,x,y,width,height)
+                image(fireball,this.x,this.y,100,100)
+                fill("black")
+                rect(w-100,this.yBlock,50,100)
+
+                hits = collideRectRect(this.x,this.y,1,100,w-100,this.yBlock,5,50)
+            }
+            
+            this.update = function() {
+                this.x += this.xVelocity
+                console.log(w)
+                console.log(this.x)
+
+                if (hits == true) {
+                    hitSound.play()
+                    score -= 2 
+                }
+
+                if (this.x > w) {
+                    this.x = 0
+                    this.y = random(0,h-100)
+                    score += 1
+                    document.getElementById("score").innerHTML = score
+                }
+
+                if (keyIsDown(38)){ 
+                    this.yBlock -= this.yVelocity
+                }
+                if (keyIsDown(40)) {
+                    this.yBlock += this.yVelocity
+                }
+
+            }
+        }
+        
+        function draw() { 
+            clear()
+            movingFire.show()
+            movingFire.update()
+            
+        }
+    </script>
+    <h1 id = "score"></h1>
+</body>
+</html>
