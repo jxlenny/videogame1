@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js" integrity="sha512-uaz5GpnQoE6t5echKlX8P52czvsIGgLPcvlzfvRubLZ1Hp8JemUDnbUiAahbVtPb+jUVrNETuXvAhDDF/N3M4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Includes the p5.collide2D addon library -->
+    <script defer src="https://unpkg.com/p5.collide2d"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500&display=swap" rel="stylesheet">
+
+    <style>
+        #body { 
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+        }
+
+        #description {
+            color: white;
+            font-family: 'pixelify sans',sans-serif;
+            font-size: 8vw;
+            background-color: red;
+            width: 70vw;
+            text-align: center;
+            position: absolute;
+            left: 15vw;
+            top: 3vw;
+        }
+
+        .playerImage { 
+            width: 26vw;
+            max-width: 300px;
+            background-color: grey;
+            height: 35vw;
+            max-height: 400px;
+        }
+
+        #playerContainer { 
+            position: absolute; 
+            width: 90vw;
+            left: 5vw;
+            top: 15vw;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            /*background-color: orange;*/
+        }
+
+        .choice { 
+            background-color: red;
+            font-family: 'pixelify sans',sans-serif;
+            color: white; 
+            font-size: 3vw;
+            width: 15vw;
+            min-width: 100px;
+            position: relative;
+            top: 20px;
+        }
+
+        .stats { 
+            width: 26vw;
+            max-width: 300px;
+            background-color: rgba(0, 0, 0,0.4);
+            height: 35vw;
+            max-height: 400px;
+            color: white;
+            display: flex; 
+            justify-content: center;
+            flex-wrap: wrap;
+            font-family: "pixelify sans";
+            align-items: center;
+        }
+
+        @media screen and (max-width: 1274px) { 
+            .stats { 
+                font-size: 2vw;
+            }
+        }
+        @media screen and (min-width: 1275px) { 
+            .stats { 
+                font-size: 1.7vw;
+            }
+        }
+
+        #statsContainer { 
+            position: absolute; 
+            width: 90vw;
+            left: 5vw;
+            top: 15vw;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .playerChoice { 
+            width: 26vw; 
+            max-width: 300px;
+            display: flex; 
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        h2 { 
+            text-align: center;
+        }
+
+        #back {
+            background-color: black;
+            font-family: 'pixelify sans',sans-serif;
+            color: white; 
+            font-size: 1vw;
+            width: 8vw;
+            min-width: 25px;
+            position: relative;
+            top: 1vw;
+            left: 1vw;
+        }
+        #back:hover {
+            background-color: red;
+        }
+
+        #notifier { 
+            z-index: 3;
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            width: 80%;
+            max-width: 650px; 
+            height: 75%;
+        }
+
+        #helper { 
+            width: 50vw;
+            max-width: 300px;
+            position: absolute; 
+            bottom: -50px;
+            right: 0px;
+        }
+
+        #text { 
+            background-color: white; 
+            width: 50%;
+            font-family: 'pixelify sans',sans-serif;
+            font-size: 30px;
+            padding: 15px;
+        }
+        @media screen and (max-width: 810px) {
+            #text { 
+                font-size: 3.7vw;
+            }
+        }
+        @media screen and (max-width: 560px) {
+            #notifier { 
+                height: 65%; 
+            }
+        }
+
+        #exit { 
+            z-index: 4;
+            position: relative;
+            background-color: white;
+            border: white;
+            top: 2px;
+        }
+        #exit:hover {
+            background-color: red;
+        }
+
+        #show {
+            width: 50px;
+            height: 50px; 
+            background-color: white;
+            position: absolute; 
+            bottom: 10px;
+            right: 10px; 
+            z-index: -50;
+            display: flex; 
+            justify-content: center; 
+            font-family: "pixelify sans";
+            align-items: center; 
+            font-size: 30px;
+            visibility: hidden;
+        }
+        #show:hover { 
+            background-color: red;
+        }
+    </style>
+</head>
+<body id="body">
+    <button id="back" onclick="back()">Back</button>
+    <div id="description">
+        Choose a Player
+    </div>
+    <div id="screenContainter">
+        <div id="statsContainer">
+            <div class="stats" id="player1Stats" onclick="hideStats1()">
+                <h2>
+                    Mr/Ms. Popular <br><br>
+                    Reputation: 40/50 <br>
+                    Stealth: 25/50 <br>
+                    Luck: 15/50
+                </h2>
+                
+            </div>
+            <div class="stats" id="player2Stats" onclick="hideStats2()">
+                <h2>The Classic Skipper <br><br>
+                    Reputation: 40/50 <br>
+                    Stealth: 25/50 <br>
+                    Luck: 15/50
+                </h2>
+            </div>
+            <div class="stats" id="player3Stats" onclick="hideStats3()">
+                <h2>Never Studies but Gets Good Grades <br><br>
+                    Reputation: 25/50 <br>
+                    Stealth: 15/50 <br>
+                    Luck: 40/50
+                </div>
+        </div>
+        <div id="playerContainer">
+            <div class="playerChoice">
+                <div class="playerImage" id="player1Image" onclick="showStats1()"></div>
+                <button class="choice" id="choice1" onclick="playerOne()">Player 1</button>
+            </div>
+            <div class="playerChoice">
+                <div class="playerImage" id="player2Image" onclick="showStats2()"></div>
+                <button class="choice" id="choice2" onclick="playerTwo()">Player 2</button>
+            </div>
+            <div class="playerChoice">
+                <div class="playerImage" id="player3Image" onclick="showStats3()"></div>
+                <button class="choice" id="choice3" onclick="playerThree()">Player 3</button>
+            </div>
+        </div>
+    </div>
+    <div id="notifier">
+        <img id="helper" src="notificationImage.png">
+        <div id="text">
+            Welcome! I will be helping you escape Mr. Kam. First, though you must decide what kind of student you are. Be careful... it may decide your fate in the near future. Best of luck.
+        </div>
+        <button id="exit" onclick="hide()">X</button>
+    </div>
+    <div id="show" onclick="show()">
+        ?
+    </div>
+
+    <script> 
+        let player1 = document.getElementById("player1Image")
+        let player2 = document.getElementById("player2Image")
+        let player3 = document.getElementById("player3Image")
+
+        let player1Stats = document.getElementById("player1Stats")
+        let player2Stats = document.getElementById("player2Stats")
+        let player3Stats = document.getElementById("player3Stats")
+
+        function showStats1() { 
+            console.log("on")
+            player1.style.zIndex = "-1"
+            player1Stats.style.zIndex = "1"
+        }
+        function hideStats1() { 
+            console.log("off")
+            player1.style.zIndex = "1"
+            player1Stats.style.zIndex = "-1"
+        }
+
+        function showStats2() { 
+            console.log("on")
+            player2.style.zIndex = "-1"
+            player2Stats.style.zIndex = "1"
+        }
+        function hideStats2() { 
+            console.log("off")
+            player2.style.zIndex = "1"
+            player2Stats.style.zIndex = "-1"
+        }
+
+        function showStats3() { 
+            console.log("on")
+            player3.style.zIndex = "-1"
+            player3Stats.style.zIndex = "1"
+        }
+        function hideStats3() { 
+            console.log("off")
+            player3.style.zIndex = "1"
+            player3Stats.style.zIndex = "-1"
+        }
+
+        function playerOne() {
+            let reputation = localStorage.setItem("rep",40)
+            let stealth = localStorage.setItem("stealth",25)
+            let luck = localStorage.setItem("luck",15)
+            window.location.href = "playerChoiceTest.html"
+        }
+
+        function playerTwo() { 
+            let reputation = localStorage.setItem("rep",15)
+            let stealth = localStorage.setItem("stealth",40)
+            let luck = localStorage.setItem("luck",25)
+            window.location.href = "playerChoiceTest.html"
+        }
+
+        function playerThree() {
+            let reputation = localStorage.setItem("rep",25)
+            let stealth = localStorage.setItem("stealth",15)
+            let luck = localStorage.setItem("luck",40)
+            window.location.href = "playerChoiceTest.html"
+        }
+        
+        function back() { 
+            window.location.href = "titleScreen.html"
+        }
+
+        let exit = document.getElementById("notifier")
+        let appear = document.getElementById('show')
+        function hide() {      
+            exit.style.zIndex="-5"
+            exit.style.visibility="hidden"
+            appear.style.visibility="visible"
+        }
+        function show() { 
+            exit.style.zIndex="5"
+            exit.style.visibility="visible"
+            appear.style.visibility="visible"
+        }
+
+      
+    </script>
+</body>
+</html>
