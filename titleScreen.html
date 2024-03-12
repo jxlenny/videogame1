@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js" integrity="sha512-uaz5GpnQoE6t5echKlX8P52czvsIGgLPcvlzfvRubLZ1Hp8JemUDnbUiAahbVtPb+jUVrNETuXvAhDDF/N3M4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Includes the p5.collide2D addon library -->
+    <script defer src="https://unpkg.com/p5.collide2d"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500&display=swap" rel="stylesheet">
+    
+    <style>
+        #body { 
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+        }
+
+        #title { 
+            font-family: 'Pixelify Sans', sans-serif;
+            color: white;
+            font-size: 10vw;
+            position: absolute;
+            width: 80vw;
+            left: 10vw;
+            top: 8vw;
+            text-align: center;
+        }
+
+        #title:hover { 
+            color: red;
+        }
+
+        #kam {
+            position: absolute;
+            bottom: -20px;
+            height: 40vw;
+            max-height: 30vw;
+        }
+
+        #description {
+            color: white;
+            font-family: 'pixelify sans', sans-serif;
+            text-align: center;
+            width: 80vw;
+            font-size: 4vw;
+            position: absolute; 
+            left: 10vw;
+            top: 20vw;
+        
+        }
+
+        .welcomeButton {
+            background-color: red; 
+            font-family: "pixelify sans",sans-serif;
+            color: white;
+            font-size: 5vw;
+            margin-left: auto;
+            margin-right: auto;
+            position: absolute;
+            width: 30vw;
+        }
+
+        #nextScreen { 
+            left: 35vw;
+            top: 30vw;
+        }
+        #howToPlay {
+            left: 35vw; 
+            top: 38vw;
+        }
+    </style>
+</head>
+<body id="body">
+    <div id="title">Escape Mr. Kam</div>
+    <img id="kam" src="kamPhoto.png">
+    <div id="description">A test of reputation, stealth, and luck.</div>
+    <button class="welcomeButton" id="nextScreen" onclick="nextScreen()">Play</button>
+    <button class="welcomeButton" id="howToPlay" onclick="instructions()">How to Play</button>
+
+    <script>
+        function nextScreen() { 
+            window.location.href="choosePlayer.html"
+        }
+    </script>
+</body>
+</html>
