@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js" integrity="sha512-uaz5GpnQoE6t5echKlX8P52czvsIGgLPcvlzfvRubLZ1Hp8JemUDnbUiAahbVtPb+jUVrNETuXvAhDDF/N3M4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Includes the p5.collide2D addon library -->
+    <script defer src="https://unpkg.com/p5.collide2d"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            overflow: hidden; 
+            margin: 0;
+            padding: 0;
+            background-color: black;
+        }
+
+        #notifier { 
+            z-index: 3;
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            width: 50%;
+            max-width: 550px; 
+            height: 60%;
+        }
+
+        #helper { 
+            width: 50vw;
+            max-width: 300px;
+            position: absolute; 
+            bottom: -50px;
+            right: 0px;
+        }
+
+        #text { 
+            background-color: white; 
+            width: 50%;
+            font-family: 'pixelify sans',sans-serif;
+            font-size: 30px;
+            padding: 15px;
+        }
+        @media screen and (max-width: 810px) {
+            #text { 
+                font-size: 3.7vw;
+            }
+        }
+        @media screen and (max-width: 560px) {
+            #notifier { 
+                height: 65%; 
+            }
+        }
+
+        #exit { 
+            z-index: 4;
+            position: relative;
+            background-color: white;
+            border: white;
+            top: 2px;
+        }
+        #exit:hover {
+            background-color: red;
+        }
+
+        #show {
+            width: 50px;
+            height: 50px; 
+            background-color: white;
+            position: absolute; 
+            bottom: 10px;
+            right: 10px; 
+            z-index: -50;
+            display: flex; 
+            justify-content: center; 
+            font-family: "pixelify sans";
+            align-items: center; 
+            font-size: 30px;
+        }
+
+        #show:hover { 
+            background-color: red;
+        }
+
+        #levelId { 
+            color: white; 
+            font-family: "pixelify sans";
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="notifier">
+        <img id="helper" src="notificationImage.png">
+        <div id="text">
+            Quick! Use your arrow buttons to try to escape Mr. Kam.
+        </div>
+        <button id="exit" onclick="hide()">X</button>
+    </div>
+    <div id="show" onclick="show()">?</div>
+    
+    <script> 
+        //set width height
+        let w = window.innerWidth
+        let h = window.innerHeight 
+        
+        //objects moving
+        let player
+        let teacher1
+        let teacher2
+        let teacher3
+        let endgame
+
+        //calculating position in reference to
+        let xWhite = (w/2)-0.25*w
+        let yWhite = (h/2)-0.25*w
+        
+
+        function setup() {
+            createCanvas(w,h)
+            player = new runner()
+            teacher1 = new teacherOne()
+            teacher2 = new teacherTwo()
+            teacher3 = new teacherThree()
+            endgame = new endGame()
+
+        }
+
+       //button
+       let exit = document.getElementById("notifier")
+        let appear = document.getElementById('show')
+        function hide() {      
+            exit.style.zIndex="-5"
+            appear.style.zIndex="5"
+            exit.style.visibility="hidden"
+            appear.style.visibility="visible"
+        }
+        function show() { 
+            exit.style.zIndex="5"
+            appear.style.zIndex="-5"
+            exit.style.visibility="visible"
+            appear.style.visibility="visible"
+            start += 1
+        }
+
+        //wall limits
+        let leftWall = false
+        let topWall = false;
+        let rightWall = false; 
+        let bottomWall = false
+
+        let yVelocity = 0
+        let xVelocity = 0
+
+        let backwardsT1
+        let backwardsT2 
+        let backwardsT3 
+
+        function teacherThree() {
+            this.x = xWhite+0.02*w
+            this.y = yWhite+0.42*w
+
+            this.show = function() { 
+                noStroke()
+                fill("red")
+                ellipse(this.x,this.y,0.02*w)
+                stroke(0,0,0)
+                line(xWhite+0.1*w,yWhite+0.41*w,xWhite+0.15*w,yWhite+0.41*w)
+            }
+            this.update = function() { 
+                let start = document.getElementById("notifier")
+                if (start.style.visibility == "hidden") { 
+                    this.velocity = 0.005*w
+                }
+                else { 
+                    this.velocity = 0 
+                }
+
+                let backwardsCollideT3 = collideLineCircle(xWhite+0.1*w,yWhite+0.41*w,xWhite+0.15*w,yWhite+0.41*w,this.x,this.y,0.02*w)
+                if (backwardsCollideT3 == true) { 
+                    backwardsT3 = 1 
+                }
+                if (backwardsT3 == 1) { 
+                    this.velocity = -0.005*w
+                }
+
+                if (this.velocity > 0) { 
+                    if (this.x <= xWhite+0.075*w) { 
+                        this.x += this.velocity
+                    }
+                    if ((this.x >= xWhite+0.075*w)&&(this.x<=xWhite+0.125*w) && (this.y <= 0.525*w)) {
+                        this.y += this.velocity
+                    }
+                    if ((this.x >= xWhite+0.075*w)&&(this.x<=xWhite+0.125*w)&&(this.y>=0.525*w)){ 
+                        this.x += this.velocity
+                    }
+                    if ((this.x>= xWhite+0.125*w)&&(this.y>=yWhite+0.425*w)){ 
+                        this.y -= this.velocity
+                    }
+                }
+                if (this.velocity < 0) { 
+                    if ((this.y<=0.525*w) && (this.x>=0.175)) { 
+                        this.y -= this.velocity
+                        console.log("1")
+                    }
+                    if ((this.y>=0.525*w)&&(this.x >= xWhite+0.075*w)) { 
+                        this.x += this.velocity
+                    }
+                    if ((this.x<= xWhite+0.076*w)&&(this.y >= yWhite+0.425*w)){
+                        this.y += this.velocity
+                        console.log("2")
+                    }
+                }
+            }
+        }
+
+        function teacherTwo() { 
+            this.x = xWhite+0.22*w
+            this.y = yWhite+0.125*w
+
+            this.show = function() { 
+                noStroke()
+                fill("red")
+                ellipse(this.x,this.y,0.02*w)
+                stroke(0,0,0)
+            }
+            this.update = function() { 
+                let start = document.getElementById("notifier")
+                if (start.style.visibility == "hidden") { 
+                    xVelocity = w*0.005
+                    yVelocity = w*0.005
+                }
+                else { 
+                    xVelocity = 0 
+                    yVelocity = 0
+                }
+                this.yVelocity = yVelocity
+                this.xVelocity = xVelocity
+
+                let backwardsCollideT2 = collideLineCircle(xWhite+0.3*w,yWhite+0.249*w,xWhite+0.35*w,yWhite+0.249*w,this.x,this.y,0.02*w)
+                if (backwardsCollideT2==true) {
+                    backwardsT2 = 1
+                }
+                if (backwardsT2 == 1) { 
+                    this.yVelocity = -yVelocity
+                    this.xVelocity = -xVelocity
+                }
+
+                let forwardsT1
+                if (start.style.visibility == "hidden") { 
+                    forwardsT1 = collideLineCircle(xWhite+0.2*w,yWhite+0.1*w,xWhite+0.2*w,yWhite+0.15*w,this.x,this.y,0.02*w)
+                }
+
+                if (forwardsT1==true) {
+                    backwardsT2 -= 1
+                }
+                if (backwardsT2 == 0) { 
+                    this.yVelocity = -yVelocity
+                    this.xVelocity = -xVelocity
+                } 
+
+
+                if ((this.xVelocity > 0 )&& (this.x <= xWhite+0.325*w)) { 
+                    this.x += this.xVelocity
+                }
+                if ((this.yVelocity > 0) && (this.x >= xWhite+0.32*w)&&(this.y<=yWhite+0.235*w)) { 
+                    this.y += this.yVelocity
+                }
+
+                if ((this.xVelocity < 0) && (this.y <= yWhite+0.125*w)&&(this.x >= xWhite+0.215*w)) { 
+                    this.x += this.xVelocity
+                }
+                if ((this.yVelocity < 0) && (this.y>=yWhite+0.125*w)) { 
+                    this.y += this.yVelocity
+                }
+            }
+        }
+
+        function teacherOne() { 
+            this.x = xWhite+0.325*w
+            this.y = yWhite+0.425*w
+
+            this.show = function() { 
+                noStroke()
+                fill("red")
+                ellipse(this.x,this.y,0.02*w)
+            }
+            this.update = function() {
+                let start = document.getElementById("notifier")
+                if (start.style.visibility == "hidden") { 
+                    xVelocity = w*0.004
+                    yVelocity = w*0.004
+                }
+                else { 
+                    xVelocity = 0 
+                    yVelocity = 0
+                }
+                this.yVelocity = yVelocity
+                this.xVelocity = xVelocity
+
+
+                let backwards = collideLineCircle(xWhite+0.45*w,yWhite+0.245*w,xWhite+0.5*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                if (backwards==true) {
+                    backwardsT1 = 1
+                }
+                if (backwardsT1 == 1) { 
+                    this.yVelocity = -yVelocity
+                    this.xVelocity = -xVelocity
+                }
+
+                let forwards
+                if (start.style.visibility == "hidden") { 
+                    forwards = collideLineCircle(xWhite+0.320*w,yWhite+0.4*w,xWhite+0.320*w,yWhite+0.45*w,this.x,this.y,0.02*w)
+                }
+
+                if (forwards==true) {
+                    backwardsT1 -= 1
+                }
+                if (backwardsT1 == 0) { 
+                    this.yVelocity = -yVelocity
+                    this.xVelocity = -xVelocity
+                }                
+
+                if ((this.x <= xWhite+0.475*w)&&(this.xVelocity>0)) { 
+                    this.x += this.xVelocity
+                }
+                if ((this.y >= yWhite+0.25*w) && (this.x >= xWhite+0.475*w) && (this.yVelocity>0)){ 
+                    this.y -= this.yVelocity
+                }
+
+                if ((this.y <= yWhite+0.420*w) && (this.yVelocity < 0)) { 
+                    this.y -= this.yVelocity
+                }
+                if ((this.x >= xWhite+0.325*w)&&(this.yVelocity <0)&&(this.y >= yWhite+0.420*w)) { 
+                    this.x += this.xVelocity
+                }
+            }
+        }
+
+        function runner() { 
+            this.x = (w/2)+0.205*w
+            this.y = (h/2)-0.225*w 
+
+            this.show = function() {
+                fill("green")
+                noStroke();
+                rect(xWhite+0.2525*w,yWhite+0.4525*w,0.045*w,0.045*w)
+                rect(xWhite+0.1525*w,yWhite+0.0025*w,0.045*w,0.045*w)
+                fill("blue")
+                ellipse(this.x,this.y,0.02*w)
+                
+                stroke(0,0,0);
+
+                leftWall = collideLineCircle((w/2)-0.25*w,(h/2)-0.25*w,(w/2)-0.25*w,(h/2)+0.25*w,this.x,this.y,0.02*w)
+                topWall = collideLineCircle((w/2)-0.25*w,(h/2)-0.25*w,(w/2)+0.25*w,(h/2)-0.25*w,this.x,this.y,0.02*w)
+                bottomWall = collideLineCircle((w/2)-0.25*w,(h/2)+0.25*w,(w/2)+0.25*w,(h/2)+0.25*w,this.x,this.y,0.02*w)
+                rightWall = collideLineCircle((w/2)+0.25*w,(h/2)-0.25*w,(w/2)+0.25*w,(h/2)+0.25*w,this.x,this.y,0.02*w)
+
+                endLevel = collideRectCircle(xWhite+0.2525*w,yWhite+0.4525*w,0.045*w,0.045*w,this.x,this.y,0.02*w)
+            }
+
+            this.update = function() { 
+                let start = document.getElementById("notifier")
+                if (start.style.visibility == "hidden") { 
+                    xVelocity = w*0.004
+                    yVelocity = w*0.004
+                }
+                else { 
+                    xVelocity = 0 
+                    yVelocity = 0
+                }
+                this.yVelocity = yVelocity
+                this.xVelocity = xVelocity
+
+                if (endLevel == true) { 
+
+                }
+
+                //vertical lines
+                let lineOneLeft = collideLineCircle(xWhite+0.205*w,yWhite,xWhite+0.205*w,yWhite+0.045*w,this.x,this.y,0.02*w)
+                let lineOneRight = collideLineCircle(xWhite+0.195*w,yWhite,xWhite+0.195*w,yWhite+0.045*w,this.x,this.y,0.02*w)
+                if (lineOneLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineOneRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineTwoLeft = collideLineCircle(xWhite+0.305*w,yWhite,xWhite+0.305*w,yWhite+0.095*w,this.x,this.y,0.02*w)
+                let lineTwoRight = collideLineCircle(xWhite+0.295*w,yWhite,xWhite+0.295*w,yWhite+0.095*w,this.x,this.y,0.02*w)
+                if (lineTwoLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineTwoRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineThreeLeft = collideLineCircle(xWhite+0.405*w,yWhite,xWhite+0.405*w,yWhite+0.095*w,this.x,this.y,0.02*w)
+                let lineThreeRight = collideLineCircle(xWhite+0.395*w,yWhite,xWhite+0.395*w,yWhite+0.095*w,this.x,this.y,0.02*w)
+                if (lineThreeLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineThreeRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineFourLeft = collideLineCircle(xWhite+0.155*w,yWhite+0.055*w,xWhite+0.155*w,yWhite+0.145*w,this.x,this.y,0.02*w)
+                let lineFourRight = collideLineCircle(xWhite+0.145*w,yWhite+0.055*w,xWhite+0.145*w,yWhite+0.145*w,this.x,this.y,0.02*w)
+                if (lineFourLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineFourRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineFiveLeft = collideLineCircle(xWhite+0.255*w,yWhite+0.055*w,xWhite+0.255*w,yWhite+0.095*w,this.x,this.y,0.02*w)
+                let lineFiveRight = collideLineCircle(xWhite+0.245*w,yWhite+0.055*w,xWhite+0.245*w,yWhite+0.095*w,this.x,this.y,0.02*w)
+                if (lineFiveLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineFiveRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineSixLeft = collideLineCircle(xWhite+0.355*w,yWhite+0.055*w,xWhite+0.355*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                let lineSixRight = collideLineCircle(xWhite+0.345*w,yWhite+0.055*w,xWhite+0.345*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                if (lineSixLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineSixRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineSevenLeft = collideLineCircle(xWhite+0.455*w,yWhite+0.105*w,xWhite+0.455*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                let lineSevenRight = collideLineCircle(xWhite+0.45*w,yWhite+0.105*w,xWhite+0.45*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                if (lineSevenLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineSevenRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineEightLeft = collideLineCircle(xWhite+0.105*w,yWhite+0.155*w,xWhite+0.105*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                let lineEightRight = collideLineCircle(xWhite+0.095*w,yWhite+0.155*w,xWhite+0.095*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                if (lineEightLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineEightRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineNineLeft = collideLineCircle(xWhite+0.205*w,yWhite+0.155*w,xWhite+0.205*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                let lineNineRight = collideLineCircle(xWhite+0.195*w,yWhite+0.155*w,xWhite+0.195*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                if (lineNineLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineNineRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineTenLeft = collideLineCircle(xWhite+0.305*w,yWhite+0.155*w,xWhite+0.305*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                let lineTenRight = collideLineCircle(xWhite+0.295*w,yWhite+0.155*w,xWhite+0.295*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                if (lineTenLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineTenRight==true) { 
+                    rightWall = true;
+
+                }
+
+                let lineEleLeft = collideLineCircle(xWhite+0.405*w,yWhite+0.155*w,xWhite+0.405*w,yWhite+0.295*w,this.x,this.y,0.02*w)
+                let lineEleRight = collideLineCircle(xWhite+0.395*w,yWhite+0.155*w,xWhite+0.395*w,yWhite+0.295*w,this.x,this.y,0.02*w)
+                if (lineEleLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineEleRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineTweLeft = collideLineCircle(xWhite+0.255*w,yWhite+0.205*w,xWhite+0.255*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                let lineTweRight = collideLineCircle(xWhite+0.245*w,yWhite+0.205*w,xWhite+0.245*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                if (lineTweLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineTweRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineThiLeft = collideLineCircle(xWhite+0.205*w,yWhite+0.255*w,xWhite+0.205*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                let lineThiRight = collideLineCircle(xWhite+0.195*w,yWhite+0.255*w,xWhite+0.195*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                if (lineThiLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineThiRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineFouLeft = collideLineCircle(xWhite+0.305*w,yWhite+0.255*w,xWhite+0.305*w,yWhite+0.495*w,this.x,this.y,0.02*w)
+                let lineFouRight = collideLineCircle(xWhite+0.295*w,yWhite+0.25*w,xWhite+0.295*w,yWhite+0.495*w,this.x,this.y,0.02*w)
+                if (lineFouLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineFouRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineFifLeft = collideLineCircle(xWhite+0.055*w,yWhite+0.305*w,xWhite+0.055*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                let lineFifRight = collideLineCircle(xWhite+0.045*w,yWhite+0.305*w,xWhite+0.045*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                if (lineFifLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineFifRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineSixtLeft = collideLineCircle(xWhite+0.355*w,yWhite+0.305*w,xWhite+0.355*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                let lineSixtRight = collideLineCircle(xWhite+0.345*w,yWhite+0.305*w,xWhite+0.345*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                if (lineSixtLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineSixtRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineSevLeft = collideLineCircle(xWhite+0.455*w,yWhite+0.305*w,xWhite+0.45*w,yWhite+0.395*w,this.x,this.y,0.02*w)
+                let lineSevRight = collideLineCircle(xWhite+0.445*w,yWhite+0.305*w,xWhite+0.445*w,yWhite+0.395*w,this.x,this.y,0.02*w)
+                if (lineSevLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineSevRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineEigLeft = collideLineCircle(xWhite+0.105*w,yWhite+0.355*w,xWhite+0.105*w,yWhite+0.445*w,this.x,this.y,0.02*w)
+                let lineEigRight = collideLineCircle(xWhite+0.095*w,yWhite+0.355*w,xWhite+0.095*w,yWhite+0.445*w,this.x,this.y,0.02*w)
+                if (lineEigLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineEigRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineNinLeft = collideLineCircle(xWhite+0.055*w,yWhite+0.455*w,xWhite+0.055*w,yWhite+0.495*w,this.x,this.y,0.02*w)
+                let lineNinRight = collideLineCircle(xWhite+0.045*w,yWhite+0.455*w,xWhite+0.045*w,yWhite+0.495*w,this.x,this.y,0.02*w)
+                if (lineNinLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineNinRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineTwenLeft = collideLineCircle(xWhite+0.155*w,yWhite+0.455*w,xWhite+0.155*w,yWhite+0.495*w,this.x,this.y,0.02*w)
+                let lineTwenRight = collideLineCircle(xWhite+0.145*w,yWhite+0.455*w,xWhite+0.145*w,yWhite+0.495*w,this.x,this.y,0.02*w)
+                if (lineTwenLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineTwenRight==true) { 
+                    rightWall = true;
+                }
+
+                let lineTOneLeft = collideLineCircle(xWhite+0.255*w,yWhite+0.455*w,xWhite+0.255*w,yWhite+0.495*w,this.x,this.y,0.02*w)
+                let lineTOneRight = collideLineCircle(xWhite+0.245*w,yWhite+0.455*w,xWhite+0.245*w,yWhite+0.495*w,this.x,this.y,0.02*w)
+                if (lineTOneLeft==true) { 
+                    leftWall = true;
+                }
+                if (lineTOneRight==true) { 
+                    rightWall = true;
+                }
+
+                /* outline
+                let line_Left = collideLineCircle(,this.x,this.y,0.02*w)
+                let line_Right = collideLineCircle(x,this.x,this.y,0.02*w)
+                if (line_Left==true) { 
+                    leftWall = true;
+                }
+                if (line_Right==true) { 
+                    rightWall = true;
+                }
+                */
+
+                /*horizontal lines 
+                let line_Top = collideLineCircle(,this.x,this.y,0.02*w)
+                let line_Bottom = collideLineCircle(,this.x,this.y,0.02*w)
+                if (line_Top==true) { 
+                    topWall = true;
+                }
+                if (line_Bottom==true) { 
+                    bottomWall = true;
+                }
+                */
+
+                let lineOneTop = collideLineCircle(xWhite+0.055*w,yWhite+0.055*w,xWhite+0.195*w,yWhite+0.055*w,this.x,this.y,0.02*w)
+                let lineOneBottom = collideLineCircle(xWhite+0.055*w,yWhite+0.045*w,xWhite+0.195*w,yWhite+0.045*w,this.x,this.y,0.02*w)
+                if (lineOneTop==true) { 
+                    topWall = true;
+                }
+                if (lineOneBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineTwoTop = collideLineCircle(xWhite+0.455*w,yWhite+0.055*w,xWhite+0.5*w,yWhite+0.055*w,this.x,this.y,0.02*w)
+                let lineTwoBottom = collideLineCircle(xWhite+0.455*w,yWhite+0.045*w,xWhite+0.5*w,yWhite+0.045*w,this.x,this.y,0.02*w)
+                if (lineTwoTop==true) { 
+                    topWall = true;
+                }
+                if (lineTwoBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineThreeTop = collideLineCircle(xWhite,yWhite+0.105*w,xWhite+0.095*w,yWhite+0.105*w,this.x,this.y,0.02*w)
+                let lineThreeBottom = collideLineCircle(xWhite,yWhite+0.095*w,xWhite+0.095*w,yWhite+0.095*w,this.x,this.y,0.02*w)
+                if (lineThreeTop==true) { 
+                    topWall = true;
+                }
+                if (lineThreeBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineFourTop = collideLineCircle(xWhite+0.2*w,yWhite+0.105*w,xWhite+0.3*w,yWhite+0.105*w,this.x,this.y,0.02*w)
+                let lineFourBottom = collideLineCircle(xWhite+0.2*w,yWhite+0.095*w,xWhite+0.3*w,yWhite+0.95*w,this.x,this.y,0.02*w)
+                if (lineFourTop==true) { 
+                    topWall = true;
+                }
+                if (lineFourBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineFiveTop = collideLineCircle(xWhite+0.4*w,yWhite+0.105*w,xWhite+0.45*w,yWhite+0.105*w,this.x,this.y,0.02*w)
+                let lineFiveBottom = collideLineCircle(xWhite+0.4*w,yWhite+0.095*w,xWhite+0.45*w,yWhite+0.095*w,this.x,this.y,0.02*w)
+                if (lineFiveTop==true) { 
+                    topWall = true;
+                }
+                if (lineFiveBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineSixTop = collideLineCircle(xWhite+0.05*w,yWhite+0.155*w,xWhite+0.1*w,yWhite+0.155*w,this.x,this.y,0.02*w)
+                let lineSixBottom = collideLineCircle(xWhite+0.05*w,yWhite+0.145*w,xWhite+0.1*w,yWhite+0.145*w,this.x,this.y,0.02*w)
+                if (lineSixTop==true) { 
+                    topWall = true;
+                }
+                if (lineSixBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineSevenTop = collideLineCircle(xWhite+0.15*w,yWhite+0.155*w,xWhite+0.3*w,yWhite+0.155*w,this.x,this.y,0.02*w)
+                let lineSevenBottom = collideLineCircle(xWhite+0.15*w,yWhite+0.145*w,xWhite+0.3*w,yWhite+0.145*w,this.x,this.y,0.02*w)
+                if (lineSevenTop==true) { 
+                    topWall = true;
+                }
+                if (lineSevenBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineEightTop = collideLineCircle(xWhite,yWhite+0.205*w,xWhite+0.05*w,yWhite+0.205*w,this.x,this.y,0.02*w)
+                let lineEightBottom = collideLineCircle(xWhite,yWhite+0.195*w,xWhite+0.05*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                if (lineEightTop==true) { 
+                    topWall = true;
+                }
+                if (lineEightBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineNineTop = collideLineCircle(xWhite+0.1*w,yWhite+0.205*w,xWhite+0.15*w,yWhite+0.205*w,this.x,this.y,0.02*w)
+                let lineNineBottom = collideLineCircle(xWhite+0.1*w,yWhite+0.195*w,xWhite+0.15*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                if (lineNineTop==true) { 
+                    topWall = true;
+                    
+                }
+                if (lineNineBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineTenTop = collideLineCircle(xWhite+0.25*w,yWhite+0.205*w,xWhite+0.3*w,yWhite+0.205*w,this.x,this.y,0.02*w)
+                let lineTenBottom = collideLineCircle(xWhite+0.25*w,yWhite+0.195*w,xWhite+0.3*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                if (lineTenTop==true) { 
+                    topWall = true;
+                    
+                }
+                if (lineTenBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineEleTop = collideLineCircle(xWhite+0.35*w,yWhite+0.205*w,xWhite+0.4*w,yWhite+0.205*w,this.x,this.y,0.02*w)
+                let lineEleBottom = collideLineCircle(xWhite+0.35*w,yWhite+0.195*w,xWhite+0.4*w,yWhite+0.195*w,this.x,this.y,0.02*w)
+                if (lineEleTop==true) { 
+                    topWall = true;
+                }
+                if (lineEleBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineTweTop = collideLineCircle(xWhite,yWhite+0.255*w,xWhite+0.15*w,yWhite+0.255*w,this.x,this.y,0.02*w)
+                let lineTweBottom = collideLineCircle(xWhite,yWhite+0.245*w,xWhite+0.15*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                if (lineTweTop==true) { 
+                    topWall = true;
+                }
+                if (lineTweBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineThiTop = collideLineCircle(xWhite,yWhite+0.255*w,xWhite+0.15*w,yWhite+0.255*w,this.x,this.y,0.02*w)
+                let lineThiBottom = collideLineCircle(xWhite,yWhite+0.245*w,xWhite+0.15*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                if (lineThiTop==true) { 
+                    topWall = true;
+                }
+                if (lineThiBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineFouTop = collideLineCircle(xWhite+0.2*w,yWhite+0.255*w,xWhite+0.25*w,yWhite+0.255*w,this.x,this.y,0.02*w)
+                let lineFouBottom = collideLineCircle(xWhite+0.2*w,yWhite+0.245*w,xWhite+0.25*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                if (lineFouTop==true) { 
+                    topWall = true;
+                }
+                if (lineFouBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineFifTop = collideLineCircle(xWhite+0.3*w,yWhite+0.255*w,xWhite+0.35*w,yWhite+0.255*w,this.x,this.y,0.02*w)
+                let lineFifBottom = collideLineCircle(xWhite+0.3*w,yWhite+0.245*w,xWhite+0.35*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                if (lineFifTop==true) { 
+                    topWall = true;
+                }
+                if (lineFifBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineSixtTop = collideLineCircle(xWhite+0.05*w,yWhite+0.305*w,xWhite+0.25*w,yWhite+0.305*w,this.x,this.y,0.02*w)
+                let lineSixtBottom = collideLineCircle(xWhite+0.05*w,yWhite+0.295*w,xWhite+0.25*w,yWhite+0.295*w,this.x,this.y,0.02*w)
+                if (lineSixtTop==true) { 
+                    topWall = true;
+                }
+                if (lineSixtBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineSevTop = collideLineCircle(xWhite+0.35*w,yWhite+0.305*w,xWhite+0.45*w,yWhite+0.305*w,this.x,this.y,0.02*w)
+                let lineSevBottom = collideLineCircle(xWhite+0.35*w,yWhite+0.295*w,xWhite+0.45*w,yWhite+0.295*w,this.x,this.y,0.02*w)
+                if (lineSevTop==true) { 
+                    topWall = true;
+                }
+                if (lineSevBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineEigTop = collideLineCircle(xWhite+0.105*w,yWhite+0.355*w,xWhite+0.145*w,yWhite+0.355*w,this.x,this.y,0.02*w)
+                let lineEigBottom = collideLineCircle(xWhite+0.105*w,yWhite+0.345*w,xWhite+0.145*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                if (lineEigTop==true) { 
+                    topWall = true;
+                }
+                if (lineEigBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineNinTop = collideLineCircle(xWhite+0.255*w,yWhite+0.355*w,xWhite+0.295*w,yWhite+0.355*w,this.x,this.y,0.02*w)
+                let lineNinBottom = collideLineCircle(xWhite+0.255*w,yWhite+0.345*w,xWhite+0.295*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                if (lineNinTop==true) { 
+                    topWall = true;
+                }
+                if (lineNinBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineTwenTop = collideLineCircle(xWhite+0.35*w,yWhite+0.355*w,xWhite+0.4*w,yWhite+0.355*w,this.x,this.y,0.02*w)
+                let lineTwenBottom = collideLineCircle(xWhite+0.35*w,yWhite+0.345*w,xWhite+0.4*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                if (lineTwenTop==true) { 
+                    topWall = true;
+                }
+                if (lineTwenBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineTOneTop = collideLineCircle(xWhite+0.35*w,yWhite+0.355*w,xWhite+0.4*w,yWhite+0.355*w,this.x,this.y,0.02*w)
+                let lineTOneBottom = collideLineCircle(xWhite+0.35*w,yWhite+0.345*w,xWhite+0.4*w,yWhite+0.345*w,this.x,this.y,0.02*w)
+                if (lineTOneTop==true) { 
+                    topWall = true;
+                }
+                if (lineTOneBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineTTwoTop = collideLineCircle(xWhite,yWhite+0.405*w,xWhite+0.05*w,yWhite+0.405*w,this.x,this.y,0.02*w)
+                let lineTTwoBottom = collideLineCircle(xWhite,yWhite+0.395*w,xWhite+0.05*w,yWhite+0.395*w,this.x,this.y,0.02*w)
+                if (lineTTwoTop==true) { 
+                    topWall = true;
+                }
+                if (lineTTwoBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineTThreTop = collideLineCircle(xWhite+0.1*w,yWhite+0.405*w,xWhite+0.45*w,yWhite+0.405*w,this.x,this.y,0.02*w)
+                let lineTThreBottom = collideLineCircle(xWhite+0.1*w,yWhite+0.395*w,xWhite+0.45*w,yWhite+0.395*w,this.x,this.y,0.02*w)
+                if (lineTThreTop==true) { 
+                    topWall = true;
+                }
+                if (lineTThreBottom==true) { 
+                    bottomWall = true;
+                }
+
+                let lineTFourTop = collideLineCircle(xWhite+0.2*w,yWhite+0.455*w,xWhite+0.25*w,yWhite+0.455*w,this.x,this.y,0.02*w)
+                let lineTFourBottom = collideLineCircle(xWhite+0.2*w,yWhite+0.445*w,xWhite+0.25*w,yWhite+0.445*w,this.x,this.y,0.02*w)
+                if (lineTFourTop==true) { 
+                    topWall = true;
+                }
+                if (lineTFourBottom==true) { 
+                    bottomWall = true;
+                }
+                
+                let lineTFiveTop = collideLineCircle(xWhite+0.35*w,yWhite+0.455*w,xWhite+0.55*w,yWhite+0.455*w,this.x,this.y,0.02*w)
+                let lineTFiveBottom = collideLineCircle(xWhite+0.35*w,yWhite+0.445*w,xWhite+0.55*w,yWhite+0.445*w,this.x,this.y,0.02*w)
+                if (lineTFiveTop==true) { 
+                    topWall = true;
+                }
+                if (lineTFiveBottom==true) { 
+                    bottomWall = true;
+                }
+
+                if (keyIsDown(39) && (rightWall==false)) {
+                    this.x += this.xVelocity
+                }
+                if (keyIsDown(37) && (leftWall==false)) { 
+                    this.x -= this.xVelocity
+                }
+                if (keyIsDown(40) && (bottomWall==false)) { 
+                    this.y += this.yVelocity
+                }
+                if (keyIsDown(38) && (topWall==false)) { 
+                    this.y -= this.yVelocity
+                }
+            }
+        }
+
+        function endGame() { 
+            this.update = function() { 
+                let endGameT1 = collideCircleCircle(teacher1.x,teacher1.y,0.02*w,player.x,player.y,0.02*w)
+                let endGameT2 = collideCircleCircle(teacher2.x,teacher2.y,0.02*w,player.x,player.y,0.02*w)
+                if ((endGameT1 == true) || (endGameT2==true)){
+                    window.alert("DONE")
+                }
+            
+            }
+        }
+
+        function draw() { 
+            clear()
+            stroke(0,0,0)
+            fill("white")
+            rect(xWhite,yWhite,0.5*w,0.5*w)
+            //vertical lines
+            //1
+            line(xWhite+0.2*w,yWhite,xWhite+0.2*w,yWhite+0.05*w)
+            //2
+            line(xWhite+0.3*w,yWhite,xWhite+0.3*w,yWhite+0.1*w)
+            //3
+            line(xWhite+0.4*w,yWhite,xWhite+0.4*w,yWhite+0.1*w)
+            //4
+            line(xWhite+0.15*w,yWhite+0.05*w,xWhite+0.15*w,yWhite+0.15*w)
+            //5
+            line(xWhite+0.25*w,yWhite+0.05*w,xWhite+0.25*w,yWhite+0.1*w)
+            //6
+            line(xWhite+0.35*w,yWhite+0.05*w,xWhite+0.35*w,yWhite+0.2*w)
+            //7
+            line(xWhite+0.45*w,yWhite+0.1*w,xWhite+0.45*w,yWhite+0.25*w)
+            //8
+            line(xWhite+0.1*w,yWhite+0.15*w,xWhite+0.1*w,yWhite+0.25*w)
+            //9
+            line(xWhite+0.2*w,yWhite+0.15*w,xWhite+0.2*w,yWhite+0.2*w)
+            //10
+            line(xWhite+0.3*w,yWhite+0.15*w,xWhite+0.3*w,yWhite+0.2*w)
+            //11
+            line(xWhite+0.4*w,yWhite+0.15*w,xWhite+0.4*w,yWhite+0.3*w)
+            //12
+            line(xWhite+0.25*w,yWhite+0.2*w,xWhite+0.25*w,yWhite+0.25*w)
+            //13
+            line(xWhite+0.2*w,yWhite+0.25*w,xWhite+0.2*w,yWhite+0.35*w)
+            //14
+            line(xWhite+0.30*w,yWhite+0.25*w,xWhite+0.30*w,yWhite+0.5*w)
+            //15
+            line(xWhite+0.05*w,yWhite+0.3*w,xWhite+0.05*w,yWhite+0.35*w)
+            //16
+            line(xWhite+0.35*w,yWhite+0.3*w,xWhite+0.35*w,yWhite+0.35*w)
+            //17
+            line(xWhite+0.45*w,yWhite+0.3*w,xWhite+0.45*w,yWhite+0.4*w)
+            //18
+            line(xWhite+0.1*w,yWhite+0.35*w,xWhite+0.1*w,yWhite+0.45*w)
+            //19
+            line(xWhite+0.05*w,yWhite+0.45*w,xWhite+0.05*w,yWhite+0.5*w)
+            //20
+            line(xWhite+0.15*w,yWhite+0.45*w,xWhite+0.15*w,yWhite+0.5*w)
+            //21
+            line(xWhite+0.25*w,yWhite+0.45*w,xWhite+0.25*w,yWhite+0.5*w)
+
+            //horizontal lines 
+            //1
+            line(xWhite+0.05*w,yWhite+0.05*w,xWhite+0.2*w,yWhite+0.05*w)
+            //2
+            line(xWhite+0.45*w,yWhite+0.05*w,xWhite+0.5*w,yWhite+0.05*w)
+            //3
+            line(xWhite,yWhite+0.1*w,xWhite+0.1*w,yWhite+0.1*w)
+            //4
+            line(xWhite+0.2*w,yWhite+0.1*w,xWhite+0.3*w,yWhite+0.1*w)
+            //5
+            line(xWhite+0.4*w,yWhite+0.1*w,xWhite+0.45*w,yWhite+0.1*w)
+            //6
+            line(xWhite+0.05*w,yWhite+0.15*w,xWhite+0.1*w,yWhite+0.15*w)
+            //7
+            line(xWhite+0.15*w,yWhite+0.15*w,xWhite+0.3*w,yWhite+0.15*w)
+            //8
+            line(xWhite,yWhite+0.2*w,xWhite+0.05*w,yWhite+0.2*w)
+            //9
+            line(xWhite+0.1*w,yWhite+0.2*w,xWhite+0.15*w,yWhite+0.2*w)
+            //10
+            line(xWhite+0.25*w,yWhite+0.2*w,xWhite+0.3*w,yWhite+0.2*w)
+            //1
+            line(xWhite+0.35*w,yWhite+0.2*w,xWhite+0.4*w,yWhite+0.2*w)
+            //12
+            line(xWhite,yWhite+0.25*w,xWhite+0.15*w,yWhite+0.25*w)
+            //13
+            line(xWhite,yWhite+0.25*w,xWhite+0.15*w,yWhite+0.25*w)
+            //14
+            line(xWhite+0.2*w,yWhite+0.25*w,xWhite+0.25*w,yWhite+0.25*w)
+            //15
+            line(xWhite+0.3*w,yWhite+0.25*w,xWhite+0.35*w,yWhite+0.25*w)
+            //16
+            line(xWhite+0.05*w,yWhite+0.3*w,xWhite+0.25*w,yWhite+0.3*w)
+            //17
+            line(xWhite+0.35*w,yWhite+0.3*w,xWhite+0.45*w,yWhite+0.3*w)
+            //18
+            line(xWhite+0.1*w,yWhite+0.35*w,xWhite+0.15*w,yWhite+0.35*w)
+            //19
+            line(xWhite+0.25*w,yWhite+0.35*w,xWhite+0.3*w,yWhite+0.35*w)
+            //20
+            line(xWhite+0.35*w,yWhite+0.35*w,xWhite+0.4*w,yWhite+0.35*w)
+            //21
+            line(xWhite+0.35*w,yWhite+0.35*w,xWhite+0.4*w,yWhite+0.35*w)
+            //22
+            line(xWhite,yWhite+0.4*w,xWhite+0.05*w,yWhite+0.4*w)
+            //23
+            line(xWhite+0.1*w,yWhite+0.4*w,xWhite+0.45*w,yWhite+0.4*w)
+            //24
+            line(xWhite+0.2*w,yWhite+0.45*w,xWhite+0.25*w,yWhite+0.45*w)
+            //25
+            line(xWhite+0.35*w,yWhite+0.45*w,xWhite+0.55*w,yWhite+0.45*w)
+            player.show()
+            player.update()
+            teacher1.show()
+            teacher1.update()
+            teacher2.show()
+            teacher2.update()
+            teacher3.show()
+            teacher3.update()
+            endgame.update()
+        }
+
+    </script>
+</body>
+</html>
