@@ -158,6 +158,7 @@
         let backwardsT1
         let backwardsT2 
         let backwardsT3 
+        let forwardsCollideT3
 
         function teacherThree() {
             this.x = xWhite+0.02*w
@@ -168,51 +169,66 @@
                 fill("red")
                 ellipse(this.x,this.y,0.02*w)
                 stroke(0,0,0)
-                line(xWhite+0.1*w,yWhite+0.41*w,xWhite+0.15*w,yWhite+0.41*w)
+                
             }
             this.update = function() { 
                 let start = document.getElementById("notifier")
                 if (start.style.visibility == "hidden") { 
                     this.velocity = 0.005*w
+                    forwardsCollideT3 = collideLineCircle(xWhite+0.015*w,yWhite+0.4*w,xWhite+0.015*w,yWhite+0.5*w,this.x,this.y,0.02*w)
                 }
                 else { 
                     this.velocity = 0 
                 }
 
-                let backwardsCollideT3 = collideLineCircle(xWhite+0.1*w,yWhite+0.41*w,xWhite+0.15*w,yWhite+0.41*w,this.x,this.y,0.02*w)
+                let backwardsCollideT3 = collideLineCircle(xWhite+0.105*w,yWhite+0.42*w,xWhite+0.15*w,yWhite+0.42*w,this.x,this.y,0.02*w)
                 if (backwardsCollideT3 == true) { 
                     backwardsT3 = 1 
                 }
                 if (backwardsT3 == 1) { 
                     this.velocity = -0.005*w
                 }
+                
+                if (forwardsCollideT3==true){ 
+                        backwardsT3=2
+                }
+                if (backwardsT3==2) { 
+                    this.velocity = 0.004*w
+                }
+                /*console.log(backwardsT3)*/
 
                 if (this.velocity > 0) { 
-                    if (this.x <= xWhite+0.075*w) { 
+                    if (this.x <= xWhite+0.07*w) { 
+                        this.velocity = 0.002*w
                         this.x += this.velocity
+                        /*console.log("step1")*/
                     }
-                    if ((this.x >= xWhite+0.075*w)&&(this.x<=xWhite+0.125*w) && (this.y <= 0.525*w)) {
+                    if ((this.x >= xWhite+0.07*w)&&(this.x<=xWhite+0.125*w) && (this.y <= yWhite+0.475*w)) {
                         this.y += this.velocity
                     }
-                    if ((this.x >= xWhite+0.075*w)&&(this.x<=xWhite+0.125*w)&&(this.y>=0.525*w)){ 
+                    if ((this.x >= xWhite+0.07*w)&&(this.x<=xWhite+0.125*w)&&(this.y >= yWhite+0.475*w)){ 
                         this.x += this.velocity
                     }
                     if ((this.x>= xWhite+0.125*w)&&(this.y>=yWhite+0.425*w)){ 
                         this.y -= this.velocity
                     }
                 }
+                
                 if (this.velocity < 0) { 
-                    if ((this.y<=0.525*w) && (this.x>=0.175)) { 
+                    if ((this.y<=yWhite+0.475*w) && (this.x>=xWhite+0.125*w)) { 
                         this.y -= this.velocity
-                        console.log("1")
                     }
-                    if ((this.y>=0.525*w)&&(this.x >= xWhite+0.075*w)) { 
+                    if ((this.y>=yWhite+0.475*w)&&(this.x>=xWhite+0.07*w)){ 
+                        this.x += this.velocity 
+                    }
+                    if ((this.x<= xWhite+0.07*w)&&(this.y >= yWhite+0.425*w)){
+                        this.y += this.velocity
+                    }
+                    if ((this.y<=yWhite+0.425*w)&&(this.x <=xWhite+0.07*w)&&(this.x > xWhite+0.025*w)){
+                        this.velocity = -0.002*w
                         this.x += this.velocity
                     }
-                    if ((this.x<= xWhite+0.076*w)&&(this.y >= yWhite+0.425*w)){
-                        this.y += this.velocity
-                        console.log("2")
-                    }
+                
                 }
             }
         }
@@ -230,8 +246,8 @@
             this.update = function() { 
                 let start = document.getElementById("notifier")
                 if (start.style.visibility == "hidden") { 
-                    xVelocity = w*0.005
-                    yVelocity = w*0.005
+                    xVelocity = w*0.004
+                    yVelocity = w*0.004
                 }
                 else { 
                     xVelocity = 0 
@@ -240,7 +256,7 @@
                 this.yVelocity = yVelocity
                 this.xVelocity = xVelocity
 
-                let backwardsCollideT2 = collideLineCircle(xWhite+0.3*w,yWhite+0.249*w,xWhite+0.35*w,yWhite+0.249*w,this.x,this.y,0.02*w)
+                let backwardsCollideT2 = collideLineCircle(xWhite+0.3*w,yWhite+0.245*w,xWhite+0.35*w,yWhite+0.245*w,this.x,this.y,0.02*w)
                 if (backwardsCollideT2==true) {
                     backwardsT2 = 1
                 }
@@ -267,10 +283,11 @@
                     this.x += this.xVelocity
                 }
                 if ((this.yVelocity > 0) && (this.x >= xWhite+0.32*w)&&(this.y<=yWhite+0.235*w)) { 
+                    this.xVelocity = 0.005*w
                     this.y += this.yVelocity
                 }
 
-                if ((this.xVelocity < 0) && (this.y <= yWhite+0.125*w)&&(this.x >= xWhite+0.215*w)) { 
+                if ((this.xVelocity < 0) && (this.y <= yWhite+0.125*w)&&(this.x >= xWhite+0.21*w)) { 
                     this.x += this.xVelocity
                 }
                 if ((this.yVelocity < 0) && (this.y>=yWhite+0.125*w)) { 
@@ -378,6 +395,56 @@
                 if (endLevel == true) { 
 
                 }
+
+                let l ="left"
+                let r ="right"
+                let u = "up"
+                let b = "bottom"
+                function pointCollides(xPoint,yPoint,x,y,dir){ 
+                    let collides = collidePointCircle(xPoint,yPoint,x,y,0.02*w)
+                    if (collides ==true) {
+                        if (dir =="left") { 
+                            rightWall = true;
+                        }
+                        else if (dir =="right") { 
+                            leftWall = true;
+                        }
+                        else if (dir == "up") { 
+                            topWall = true;
+                        }
+                        else if (dir == "bottom") { 
+                            bottomWall = true;
+                        }
+                    }
+                }
+
+                pointCollides(xWhite+0.45*w,yWhite+0.05*w,this.x,this.y,l);
+                pointCollides(xWhite+0.05*w,yWhite+0.05*w,this.x,this.y,l);
+                pointCollides(xWhite+0.25*w,yWhite+0.35*w,this.x,this.y,l);
+                pointCollides(xWhite+0.2*w,yWhite+0.1*w,this.x,this.y,l);
+                pointCollides(xWhite+0.05*w,yWhite+0.15*w,this.x,this.y,l);
+                pointCollides(xWhite+0.2*w,yWhite+0.45*w,this.x,this.y,l);
+                pointCollides(xWhite+0.25*w,yWhite+0.05*w,this.x,this.y,b);
+                pointCollides(xWhite+0.35*w,yWhite+0.05*w,this.x,this.y,b);
+                pointCollides(xWhite+0.1*w,yWhite+0.1*w,this.x,this.y,r)
+                pointCollides(xWhite+0.4*w,yWhite+0.15*w,this.x,this.y,b)
+                pointCollides(xWhite+0.05*w,yWhite+0.2*w,this.x,this.y,r)
+                pointCollides(xWhite+0.15*w,yWhite+0.2*w,this.x,this.y,r)
+                pointCollides(xWhite+0.2*w,yWhite+0.2*w,this.x,this.y,u)
+                pointCollides(xWhite+0.15*w,yWhite+0.25*w,this.x,this.y,r)
+                pointCollides(xWhite+0.35*w,yWhite+0.25*w,this.x,this.y,r)
+                pointCollides(xWhite+0.25*w,yWhite+0.3*w,this.x,this.y,r)
+                pointCollides(xWhite+0.45*w,yWhite+0.25*w,this.x,this.y,u)
+                pointCollides(xWhite+0.05*w,yWhite+0.35*w,this.x,this.y,u);
+                pointCollides(xWhite+0.15*w,yWhite+0.35*w,this.x,this.y,r)
+                pointCollides(xWhite+0.25*w,yWhite+0.35*w,this.x,this.y,l)
+                pointCollides(xWhite+0.4*w,yWhite+0.35*w,this.x,this.y,r)
+                pointCollides(xWhite+0.05*w,yWhite+0.4*w,this.x,this.y,r)
+                pointCollides(xWhite+0.05*w,yWhite+0.45*w,this.x,this.y,b)
+                pointCollides(xWhite+0.15*w,yWhite+0.45*w,this.x,this.y,b)
+                pointCollides(xWhite+0.2*w,yWhite+0.45*w,this.x,this.y,l)
+                
+                
 
                 //vertical lines
                 let lineOneLeft = collideLineCircle(xWhite+0.205*w,yWhite,xWhite+0.205*w,yWhite+0.045*w,this.x,this.y,0.02*w)
@@ -838,9 +905,11 @@
             this.update = function() { 
                 let endGameT1 = collideCircleCircle(teacher1.x,teacher1.y,0.02*w,player.x,player.y,0.02*w)
                 let endGameT2 = collideCircleCircle(teacher2.x,teacher2.y,0.02*w,player.x,player.y,0.02*w)
-                if ((endGameT1 == true) || (endGameT2==true)){
+                let endGameT3 = collideCircleCircle(teacher3.x,teacher3.y,0.02*w,player.x,player.y,0.02*w)
+                if ((endGameT1 == true) || (endGameT2==true)||(endGameT3==true)){
                     window.alert("DONE")
                 }
+                
             
             }
         }
