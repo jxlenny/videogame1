@@ -96,7 +96,7 @@
     <div id="notifier">
         <img id="helper" src="notificationImage.png">
         <div id="text">
-            Quick! Use your arrow buttons to try to escape Mr. Kam.
+            Quick! There are teachers roaming the halls. DO NOT run into them. Get to the exits at the green doors by using your arrow keys. Good luck. 
         </div>
         <button id="exit" onclick="hide()">X</button>
     </div>
@@ -118,6 +118,7 @@
         let xWhite = (w/2)-0.25*w
         let yWhite = (h/2)-0.25*w
         
+        let direction ="left"
 
         function setup() {
             createCanvas(w,h)
@@ -125,8 +126,20 @@
             teacher1 = new teacherOne()
             teacher2 = new teacherTwo()
             teacher3 = new teacherThree()
+            teacher4 = new teacherFour()
             endgame = new endGame()
 
+        }
+
+        function preload() { 
+            teacherRight = loadImage("teacherRight.png")
+            teacherLeft = loadImage("teacherLeft.png")
+            teacherUp = loadImage("teacherUp.png")
+            teacherDown = loadImage("teacherDown.png")
+            player2Left = loadImage("player2Left.png")
+            player2Right = loadImage("player2Right.png")
+            player2Up = loadImage("player2Up.png")
+            player2Down = loadImage("player2Down.png")
         }
 
        //button
@@ -158,7 +171,81 @@
         let backwardsT1
         let backwardsT2 
         let backwardsT3 
+        let backwardsT4
         let forwardsCollideT3
+        let forwardsCollideT4
+
+        function teacherFour() { 
+            this.x = xWhite+0.02*w 
+            this.y = yWhite+0.12*w 
+            
+
+            this.show= function() { 
+                noStroke()
+                fill("white")
+                ellipse(this.x,this.y,0.03*w)
+                
+                stroke(0,0,0)
+            }
+
+            this.update = function() { 
+                let start = document.getElementById("notifier")
+                if (start.style.visibility == "hidden") { 
+                    this.velocity = 0.001*w
+                    forwardsCollideT4 = collideLineCircle(xWhite+0.01*w,yWhite+0.1*w,xWhite+0.01*w,yWhite+0.15*w,this.x,this.y,0.03*w)
+                }
+                else { 
+                    this.velocity = 0 
+                    image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
+                }
+
+                let backwardsCollideT4 = collideLineCircle(xWhite+0.18*w,yWhite+0.15*w,xWhite+0.18*w,yWhite+0.2*w,this.x,this.y,0.03*w)
+                if (backwardsCollideT4 == true) { 
+                    backwardsT4 = 1 
+                }
+                if (backwardsT4 == 1) { 
+                    this.velocity = -0.001*w
+                }
+
+                if (forwardsCollideT4==true){ 
+                    backwardsT4=2
+                }
+                if (backwardsT4==2) { 
+                    this.velocity = 0.001*w
+                }
+                /*
+                console.log(this.velocity)*/
+
+                if (this.velocity > 0) { 
+                    if (this.x <= xWhite+0.12*w) { 
+                        this.x += this.velocity
+                        image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
+                    }
+                    if ((this.x >= xWhite+0.12*w)&&(this.y<=yWhite+0.17*w)){ 
+                        this.y += this.velocity
+                        image(teacherDown,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
+                    }
+                    if ((this.x >=xWhite+0.12*w)&& (this.x<=xWhite+0.17*w)&&(this.y>=yWhite+0.17*w)) { 
+                        this.x +=this.velocity
+                        image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
+                    }
+                }
+                if (this.velocity < 0) { 
+                    if (this.x >= xWhite+0.12*w){ 
+                        this.x += this.velocity 
+                        image(teacherLeft,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
+                    }
+                    if ((this.x <= xWhite+0.12*w)&&(this.y>=yWhite+0.12*w)){ 
+                        this.y += this.velocity
+                        image(teacherUp,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
+                    }
+                    if ((this.x <= xWhite+0.12*w)&&(this.y<=yWhite+0.12*w)&&(this.x >= xWhite+0.02*w)) {
+                        this.x += this.velocity
+                        image(teacherLeft,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
+                    }
+                }
+            }
+        }
 
         function teacherThree() {
             this.x = xWhite+0.02*w
@@ -166,67 +253,74 @@
 
             this.show = function() { 
                 noStroke()
-                fill("red")
-                ellipse(this.x,this.y,0.02*w)
+                fill("white")
+                ellipse(this.x,this.y,0.03*w)
                 stroke(0,0,0)
                 
             }
             this.update = function() { 
                 let start = document.getElementById("notifier")
                 if (start.style.visibility == "hidden") { 
-                    this.velocity = 0.005*w
-                    forwardsCollideT3 = collideLineCircle(xWhite+0.015*w,yWhite+0.4*w,xWhite+0.015*w,yWhite+0.5*w,this.x,this.y,0.02*w)
+                    this.velocity = 0.002*w
+                    forwardsCollideT3 = collideLineCircle(xWhite+0.015*w,yWhite+0.4*w,xWhite+0.015*w,yWhite+0.5*w,this.x,this.y,0.03*w)
                 }
                 else { 
                     this.velocity = 0 
+                    image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
 
-                let backwardsCollideT3 = collideLineCircle(xWhite+0.105*w,yWhite+0.42*w,xWhite+0.15*w,yWhite+0.42*w,this.x,this.y,0.02*w)
+                let backwardsCollideT3 = collideLineCircle(xWhite+0.105*w,yWhite+0.42*w,xWhite+0.15*w,yWhite+0.42*w,this.x,this.y,0.03*w)
                 if (backwardsCollideT3 == true) { 
                     backwardsT3 = 1 
                 }
                 if (backwardsT3 == 1) { 
-                    this.velocity = -0.005*w
+                    this.velocity = -0.002*w
                 }
                 
                 if (forwardsCollideT3==true){ 
                         backwardsT3=2
                 }
                 if (backwardsT3==2) { 
-                    this.velocity = 0.004*w
+                    this.velocity = 0.002*w
                 }
                 /*console.log(backwardsT3)*/
 
                 if (this.velocity > 0) { 
                     if (this.x <= xWhite+0.07*w) { 
-                        this.velocity = 0.002*w
                         this.x += this.velocity
                         /*console.log("step1")*/
+                        image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                     }
                     if ((this.x >= xWhite+0.07*w)&&(this.x<=xWhite+0.125*w) && (this.y <= yWhite+0.475*w)) {
                         this.y += this.velocity
+                        image(teacherDown,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                     }
                     if ((this.x >= xWhite+0.07*w)&&(this.x<=xWhite+0.125*w)&&(this.y >= yWhite+0.475*w)){ 
                         this.x += this.velocity
+                        image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                     }
                     if ((this.x>= xWhite+0.125*w)&&(this.y>=yWhite+0.425*w)){ 
                         this.y -= this.velocity
+                        image(teacherUp,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                     }
                 }
                 
                 if (this.velocity < 0) { 
                     if ((this.y<=yWhite+0.475*w) && (this.x>=xWhite+0.125*w)) { 
                         this.y -= this.velocity
+                        image(teacherDown,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                     }
                     if ((this.y>=yWhite+0.475*w)&&(this.x>=xWhite+0.07*w)){ 
                         this.x += this.velocity 
+                        image(teacherLeft,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                     }
                     if ((this.x<= xWhite+0.07*w)&&(this.y >= yWhite+0.425*w)){
                         this.y += this.velocity
+                        image(teacherUp,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                     }
                     if ((this.y<=yWhite+0.425*w)&&(this.x <=xWhite+0.07*w)&&(this.x > xWhite+0.025*w)){
-                        this.velocity = -0.002*w
                         this.x += this.velocity
+                        image(teacherLeft,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                     }
                 
                 }
@@ -239,24 +333,25 @@
 
             this.show = function() { 
                 noStroke()
-                fill("red")
-                ellipse(this.x,this.y,0.02*w)
+                fill("white")
+                ellipse(this.x,this.y,0.03*w)
                 stroke(0,0,0)
             }
             this.update = function() { 
                 let start = document.getElementById("notifier")
                 if (start.style.visibility == "hidden") { 
-                    xVelocity = w*0.004
-                    yVelocity = w*0.004
+                    xVelocity = w*0.002
+                    yVelocity = w*0.002
                 }
                 else { 
                     xVelocity = 0 
                     yVelocity = 0
+                    image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
                 this.yVelocity = yVelocity
                 this.xVelocity = xVelocity
 
-                let backwardsCollideT2 = collideLineCircle(xWhite+0.3*w,yWhite+0.245*w,xWhite+0.35*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                let backwardsCollideT2 = collideLineCircle(xWhite+0.3*w,yWhite+0.245*w,xWhite+0.35*w,yWhite+0.245*w,this.x,this.y,0.03*w)
                 if (backwardsCollideT2==true) {
                     backwardsT2 = 1
                 }
@@ -267,7 +362,7 @@
 
                 let forwardsT1
                 if (start.style.visibility == "hidden") { 
-                    forwardsT1 = collideLineCircle(xWhite+0.2*w,yWhite+0.1*w,xWhite+0.2*w,yWhite+0.15*w,this.x,this.y,0.02*w)
+                    forwardsT1 = collideLineCircle(xWhite+0.2*w,yWhite+0.1*w,xWhite+0.2*w,yWhite+0.15*w,this.x,this.y,0.03*w)
                 }
 
                 if (forwardsT1==true) {
@@ -281,17 +376,20 @@
 
                 if ((this.xVelocity > 0 )&& (this.x <= xWhite+0.325*w)) { 
                     this.x += this.xVelocity
+                    image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
                 if ((this.yVelocity > 0) && (this.x >= xWhite+0.32*w)&&(this.y<=yWhite+0.235*w)) { 
-                    this.xVelocity = 0.005*w
                     this.y += this.yVelocity
+                    image(teacherDown,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
 
                 if ((this.xVelocity < 0) && (this.y <= yWhite+0.125*w)&&(this.x >= xWhite+0.21*w)) { 
                     this.x += this.xVelocity
+                    image(teacherLeft,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
                 if ((this.yVelocity < 0) && (this.y>=yWhite+0.125*w)) { 
                     this.y += this.yVelocity
+                    image(teacherUp,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
             }
         }
@@ -302,24 +400,25 @@
 
             this.show = function() { 
                 noStroke()
-                fill("red")
-                ellipse(this.x,this.y,0.02*w)
+                fill("white")
+                ellipse(this.x,this.y,0.03*w)
             }
             this.update = function() {
                 let start = document.getElementById("notifier")
                 if (start.style.visibility == "hidden") { 
-                    xVelocity = w*0.004
-                    yVelocity = w*0.004
+                    xVelocity = w*0.003
+                    yVelocity = w*0.003
                 }
                 else { 
                     xVelocity = 0 
                     yVelocity = 0
+                    image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
                 this.yVelocity = yVelocity
                 this.xVelocity = xVelocity
 
 
-                let backwards = collideLineCircle(xWhite+0.45*w,yWhite+0.245*w,xWhite+0.5*w,yWhite+0.245*w,this.x,this.y,0.02*w)
+                let backwards = collideLineCircle(xWhite+0.45*w,yWhite+0.245*w,xWhite+0.5*w,yWhite+0.245*w,this.x,this.y,0.03*w)
                 if (backwards==true) {
                     backwardsT1 = 1
                 }
@@ -343,16 +442,20 @@
 
                 if ((this.x <= xWhite+0.475*w)&&(this.xVelocity>0)) { 
                     this.x += this.xVelocity
+                    image(teacherRight,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
                 if ((this.y >= yWhite+0.25*w) && (this.x >= xWhite+0.475*w) && (this.yVelocity>0)){ 
                     this.y -= this.yVelocity
+                    image(teacherUp,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
 
                 if ((this.y <= yWhite+0.420*w) && (this.yVelocity < 0)) { 
                     this.y -= this.yVelocity
+                    image(teacherDown,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
                 if ((this.x >= xWhite+0.325*w)&&(this.yVelocity <0)&&(this.y >= yWhite+0.420*w)) { 
                     this.x += this.xVelocity
+                    image(teacherLeft,this.x-0.015*w,this.y-0.015*w,0.03*w,0.03*w)
                 }
             }
         }
@@ -367,7 +470,7 @@
                 rect(xWhite+0.2525*w,yWhite+0.4525*w,0.045*w,0.045*w)
                 rect(xWhite+0.1525*w,yWhite+0.0025*w,0.045*w,0.045*w)
                 fill("blue")
-                ellipse(this.x,this.y,0.02*w)
+                
                 
                 stroke(0,0,0);
 
@@ -443,6 +546,7 @@
                 pointCollides(xWhite+0.05*w,yWhite+0.45*w,this.x,this.y,b)
                 pointCollides(xWhite+0.15*w,yWhite+0.45*w,this.x,this.y,b)
                 pointCollides(xWhite+0.2*w,yWhite+0.45*w,this.x,this.y,l)
+                pointCollides(xWhite+0.2*w,yWhite+0.35*w,this.x,this.y,u)
                 
                 
 
@@ -886,17 +990,39 @@
                     bottomWall = true;
                 }
 
+                
                 if (keyIsDown(39) && (rightWall==false)) {
                     this.x += this.xVelocity
+                    direction = "right"
+                   
                 }
                 if (keyIsDown(37) && (leftWall==false)) { 
                     this.x -= this.xVelocity
+                    direction = "left"
+                    
                 }
                 if (keyIsDown(40) && (bottomWall==false)) { 
                     this.y += this.yVelocity
+                    direction = "down"
+                    
                 }
                 if (keyIsDown(38) && (topWall==false)) { 
                     this.y -= this.yVelocity
+                    direction = "up"
+                }
+                
+                console.log(direction)
+                if (direction == "left") { 
+                    image(player2Left,this.x-0.01*w,this.y-0.013*w,0.03*w,0.03*w)
+                }
+                else if (direction == "right") { 
+                    image(player2Right,this.x-0.02*w,this.y-0.015*w,0.03*w,0.03*w)
+                }
+                else if (direction == "up") { 
+                    image(player2Up,this.x-0.016*w,this.y-0.01*w,0.03*w,0.03*w)
+                }
+                else if (direction == "down") { 
+                    image(player2Down,this.x-0.015*w,this.y-0.02*w,0.03*w,0.03*w)
                 }
             }
         }
@@ -906,11 +1032,18 @@
                 let endGameT1 = collideCircleCircle(teacher1.x,teacher1.y,0.02*w,player.x,player.y,0.02*w)
                 let endGameT2 = collideCircleCircle(teacher2.x,teacher2.y,0.02*w,player.x,player.y,0.02*w)
                 let endGameT3 = collideCircleCircle(teacher3.x,teacher3.y,0.02*w,player.x,player.y,0.02*w)
-                if ((endGameT1 == true) || (endGameT2==true)||(endGameT3==true)){
+                let endGameT4 = collideCircleCircle(teacher4.x,teacher4.y,0.02*w,player.x,player.y,0.02*w)
+                if ((endGameT1 == true) || (endGameT2==true)||(endGameT3==true)||(endGameT4==true)){
                     window.alert("DONE")
                 }
-                
-            
+    
+                let winGameB1 = collideRectCircle(xWhite+0.2525*w,yWhite+0.4525*w,0.045*w,0.045*w,player.x,player.y,0.02*w)
+                let winGameB2 = collideRectCircle(xWhite+0.1525*w,yWhite+0.0025*w,0.045*w,0.045*w,player.x,player.y,0.02*w)
+                /*console.log(winGameB1 + "1")
+                console.log(winGameB2 + "2")*/
+                if ((winGameB1 == true)||(winGameB2 == true)) { 
+                    window.alert("WIN")
+                }
             }
         }
 
@@ -1022,6 +1155,8 @@
             teacher2.update()
             teacher3.show()
             teacher3.update()
+            teacher4.show()
+            teacher4.update()
             endgame.update()
         }
 
