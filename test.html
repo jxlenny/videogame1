@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js" integrity="sha512-uaz5GpnQoE6t5echKlX8P52czvsIGgLPcvlzfvRubLZ1Hp8JemUDnbUiAahbVtPb+jUVrNETuXvAhDDF/N3M4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Includes the p5.collide2D addon library -->
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500&display=swap" rel="stylesheet">
+    <script defer src="https://unpkg.com/p5.collide2d"></script>
+    <style>
+        #body { 
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+        }
+        .nextLevelOption { 
+            width: 500px; 
+            height: 600px;
+            position: absolute;
+            border: 3px solid red;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'pixelify sans';
+            color: white;
+            text-align: center;
+        }
+
+        #topOptionContainer {
+            background-color: black;
+            z-index: -40;
+
+        }
+
+        #bottomOptionContainer {
+            background-color: black;
+            z-index: 40;
+        }
+
+        #endHelper { 
+            width: 50%;
+            position: relative; 
+        }
+
+        .nextLevelOp { 
+            background-color: white; 
+            font-family: "pixelify sans",sans-serif;
+            color: black;
+            font-size: 40px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .nextLevelOp:hover {
+            background-color: red;
+        }
+    </style>
+</head>
+<script>
+</script>
+<body id="body">
+    <div class="nextLevelOption" id = "bottomOptionContainer">
+        <h1 style="font-size: 45px;">Congratulations</h1>
+        <img style="margin-top: -50px; " id="endHelper" src="notificationImage.png">
+        <h2 style="margin-top:0px; margin-bottom: -10px;">Some say there's privilege with popularity. Want to test your reputation?</h2>
+        <br>
+        <button class="nextLevelOp" onclick="back()">Go Back</button>
+        <button class="nextLevelOp" onclick="foreward()">Move On</button>
+    </div>
+</body>
+</html>
