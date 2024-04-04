@@ -60,6 +60,7 @@
             position: relative;
             background-color: white;
             border: white;
+            font-size: 20px;
             top: 2px;
         }
         #exit:hover {
@@ -90,6 +91,48 @@
             font-family: "pixelify sans";
             font-size: 14px;
         }
+
+        .nextLevelOption { 
+            width: 500px; 
+            height: 600px;
+            position: absolute;
+            border: 3px solid red;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'pixelify sans';
+            color: white;
+            text-align: center;
+        }
+
+        #topOptionContainer {
+            background-color: black;
+            z-index: -40;
+
+        }
+
+        #bottomOptionContainer {
+            background-color: black;
+            z-index: -40;
+        }
+
+        #endHelper { 
+            width: 50%;
+            position: relative; 
+        }
+
+        .nextLevelOp { 
+            background-color: white; 
+            font-family: "pixelify sans",sans-serif;
+            color: black;
+            font-size: 40px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .nextLevelOp:hover {
+            background-color: red;
+        }
     </style>
 </head>
 <body>
@@ -101,6 +144,22 @@
         <button id="exit" onclick="hide()">X</button>
     </div>
     <div id="show" onclick="show()">?</div>
+    <div class = "nextLevelOption" id = "topOptionContainer">
+        <h1 style="font-size: 45px;">Congratulations</h1>
+        <img style="margin-top: -50px; " id="endHelper" src="notificationImage.png">
+        <h2 style="margin-top:0px; margin-bottom: -10px;">Some say there's privilege with popularity. Want to test your reputation?</h2>
+        <br>
+        <button class="nextLevelOp" onclick="back()">Go Back</button>
+        <button class="nextLevelOp" onclick="foreward()">Move On</button>
+    </div> 
+    <div class="nextLevelOption" id = "bottomOptionContainer">
+        <h1 style="font-size: 45px;">Congratulations</h1>
+        <img style="margin-top: -50px; " id="endHelper" src="notificationImage.png">
+        <h2 style="margin-top:10px; margin-bottom: -10px;">This next level is for those with amazing luck. Willing to risk it?</h2>
+        <br>
+        <button class="nextLevelOp" onclick="back()">Go Back</button>
+        <button class="nextLevelOp" onclick="foreward()">Move On</button>
+    </div>
     
     <script> 
         //set width height
@@ -113,6 +172,22 @@
         let teacher2
         let teacher3
         let endgame
+        let topOptionContainer = document.getElementById("topOptionContainer")
+        let bottomOptionContainer = document.getElementById("bottomOptionContainer")
+        topOptionContainer.style.visibility ="hidden"
+        bottomOptionContainer.style.visibility ="hidden"
+
+        let doneCounter = 1 
+
+
+        function back() { 
+            if (doneCounter = 2) { 
+                topOptionContainer.style.zIndex = "-5";
+                topOptionContainer.style.visibility = "hidden"
+                bottomOptionContainer.style.zIndex = "-5";
+                bottomOptionContainer.style.visibility = "hidden"
+            }
+        }
 
         //calculating position in reference to
         let xWhite = (w/2)-0.25*w
@@ -143,7 +218,7 @@
         }
 
        //button
-       let exit = document.getElementById("notifier")
+        let exit = document.getElementById("notifier")
         let appear = document.getElementById('show')
         function hide() {      
             exit.style.zIndex="-5"
@@ -484,7 +559,8 @@
 
             this.update = function() { 
                 let start = document.getElementById("notifier")
-                if (start.style.visibility == "hidden") { 
+                console.log(topOptionContainer.style.visibility)
+                if ((start.style.visibility == "hidden") && (topOptionContainer.style.visibility =="hidden")&& (bottomOptionContainer.style.visibility =="hidden")) { 
                     xVelocity = w*0.004
                     yVelocity = w*0.004
                 }
@@ -1011,7 +1087,7 @@
                     direction = "up"
                 }
                 
-                console.log(direction)
+                /*console.log(direction)*/
                 if (direction == "left") { 
                     image(player2Left,this.x-0.01*w,this.y-0.013*w,0.03*w,0.03*w)
                 }
@@ -1041,9 +1117,15 @@
                 let winGameB2 = collideRectCircle(xWhite+0.1525*w,yWhite+0.0025*w,0.045*w,0.045*w,player.x,player.y,0.02*w)
                 /*console.log(winGameB1 + "1")
                 console.log(winGameB2 + "2")*/
-                if ((winGameB1 == true)||(winGameB2 == true)) { 
-                    window.alert("WIN")
+                if (winGameB2==true) { 
+                    topOptionContainer.style.zIndex = "5";
+                    topOptionContainer.style.visibility = "visible"
                 }
+                if (winGameB1==true) {
+                    bottomOptionContainer.style.zIndex = "5";
+                    bottomOptionContainer.style.visibility = "visible"
+                }
+
             }
         }
 
@@ -1159,7 +1241,7 @@
             teacher4.update()
             endgame.update()
         }
-
+        
     </script>
 </body>
 </html>
